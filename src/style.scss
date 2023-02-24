@@ -1,16 +1,13 @@
 :root {
   font-family: 'Poppins', sans-serif;
   --login-color: #000029;
-  --two-color: #11555f;
-  --three-color: #7ffa47;
-  --four-color: #081f32;
-  --five-color: #BDBDBD;
-  --six-color: #e2e2e2;
-  --seven-color: #4F4F4F;
-  --eight-color: #27ae60;
-  --nine-color : #EB5757;
-
+  --border-color: #CCCCCC;
+  --input-text-color: #999999;
+  --icon-text-color: #173EA5;
+  $medium: 700px;
 }
+
+
 
 /* http://meyerweb.com/eric/tools/css/reset/ 
    v2.0 | 20110126
