@@ -19,6 +19,21 @@ const routes = [
     name: 'home',
     component: () => import('../modules/characters/index.vue')
   },
+  {
+    path: '/favorites',
+    name: 'favorites',
+    component: () => import('../modules/characters/favorites.vue')
+  },
+  {
+    path: '/pokePin',
+    name: 'pokePin',
+    component: () => import('../modules/characters/pokePin.vue')
+  },
+  {
+    path: '/profile',
+    name: 'profile',
+    component: () => import('../modules/characters/profile.vue')
+  },
 ]
 
 const router = createRouter({

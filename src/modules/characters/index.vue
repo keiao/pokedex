@@ -3,46 +3,75 @@
     <header>
       <div class="header__content">
         <div class="search__bar">
-          <img class="search__icon" src="../../assets/search.png" alt="search">
-          <input type="text" placeholder="Procurar Pókemon...">
+          <img v-on:click="searchData" class="search__icon" src="../../assets/search.png" alt="search">
+          <input v-on:click="searchData" type="text" placeholder="Procurar Pókemon...">
         </div>
       </div>
     </header>
 
     <main>
 
+      <div v-for="pokemon in pokemons" :key="pokemon.id" class="cards__container">
 
+      <pre>{{ pokemon }}</pre>
+
+      </div>
     </main>
-
-
 
     <footer>
       <div class="navbar">
-        <div class="nav-icons">
+
+        <router-link to="" class="nav-buttons">
           <img src="../../assets/iconoir_pokeball.png">
           <h4>Pokedéx</h4>
-        </div>
+        </router-link>
 
-        <div class="nav-icons">
+        <router-link to="/pokePin" class="nav-buttons">
           <img src="../../assets/PokePin.png">
-        </div>
+        </router-link>
 
-        <div class="nav-icons">
+
+        <router-link to="/favorites" class="nav-buttons">
           <img src="../../assets/favorites.png">
-        </div>
+        </router-link>
 
-        <div class="nav-icons">
+        <router-link to="/profile" class="nav-buttons">
           <img src="../../assets/profile.png">
-        </div>
+        </router-link>
 
       </div>
+
+
     </footer>
   </div>
 </template>
 
 <script>
+import { onMounted, ref } from 'vue';
+import { pokemonClient } from "../../api";
 export default {
+  setup() {
+    const pokemons = ref([])
+    const pokemon = ref(null);
 
+    async function getPokemons() {
+      const { data } = await pokemonClient.getPokemons({
+      });
+      pokemons.value = data.results;
+      console.log(data);
+    }
+
+    onMounted(() => {
+      getPokemons();
+    })
+
+
+    return {
+      pokemons,
+      pokemon,
+    }
+
+  }
 }
 </script>
 
@@ -59,6 +88,7 @@ export default {
   align-items: center;
   position: relative;
   margin-top: 40px;
+
   @media screen and (min-width: 700px) {
     margin-top: 100px;
   }
@@ -107,11 +137,12 @@ footer {
   gap: 40px;
 }
 
-.nav-icons {
+.nav-buttons {
   display: flex;
   justify-content: center;
   flex-direction: column;
   align-items: center;
+  border: none;
 
   h4 {
     font-size: 13px;
