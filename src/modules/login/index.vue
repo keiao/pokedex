@@ -5,7 +5,7 @@
 </template>
 
 <style lang="scss" scoped>
-.login{
+.login {
   display: flex;
   justify-content: center;
   background-color: var(--login-color);

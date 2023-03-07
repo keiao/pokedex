@@ -1,6 +1,5 @@
 import { createRouter, createWebHistory } from 'vue-router'
 import login from '../modules/login/index.vue'
-import home from '../modules/characters/index.vue'
 
 
 const routes = [
@@ -8,11 +7,6 @@ const routes = [
     path: '/',
     name: 'login',
     component: login,
-  },
-  {
-    path: '/',
-    name: 'home',
-    component: home,
   },
   {
     path: '/home',
@@ -25,9 +19,9 @@ const routes = [
     component: () => import('../modules/characters/favorites.vue')
   },
   {
-    path: '/pokePin',
-    name: 'pokePin',
-    component: () => import('../modules/characters/pokePin.vue')
+    path: '/generations',
+    name: 'generations',
+    component: () => import('../modules/characters/generations.vue')
   },
   {
     path: '/profile',

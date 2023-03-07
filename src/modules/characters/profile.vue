@@ -16,7 +16,7 @@
           <img src="../../assets/iconoir_poke.png">
         </router-link>
 
-        <router-link to="/pokePin" class="nav-buttons">
+        <router-link to="/generations" class="nav-buttons">
           <img src="../../assets/PokePin.png">
         </router-link>
 

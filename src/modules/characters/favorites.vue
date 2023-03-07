@@ -1,13 +1,16 @@
 <template>
   <div class="home">
     <header>
-
+      <div class="favo">
+        <h2>Favoritos</h2>
+      </div>
     </header>
-
     <main>
-
-
-
+      <div>
+        <img src="../../assets/Magikarp_Jump_Pattern_01 1.png" >
+      </div>
+        <h1>Você não favoritou nenhum Pokémon :( </h1>
+        <p>Clique no ícone de coração dos seus pokémons favoritos e eles aparecerão aqui.</p>
     </main>
 
     <footer>
@@ -16,7 +19,7 @@
           <img src="../../assets/iconoir_poke.png">
         </router-link>
 
-        <router-link to="/pokePin" class="nav-buttons">
+        <router-link to="/generations" class="nav-buttons">
           <img src="../../assets/PokePin.png">
         </router-link>
 
@@ -29,8 +32,6 @@
           <img src="../../assets/profile.png">
         </router-link>
       </div>
-
-
     </footer>
   </div>
 </template>
@@ -42,11 +43,31 @@ export default {
 </script>
 
 <style lang="scss" scoped>
-.home {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
+.home{
   min-height: 100vh;
+}
+
+header{
+  border-bottom: 1px solid var(--border-color);
+  font-size: 18px;
+  padding: 20px;
+  font-weight: 600;
+}
+
+main{
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  flex-direction: column;
+  text-align: center;
+  margin: 100px 0px;
+  line-height: 1.2;
+}
+
+h1 {
+  font-size: 23px;
+  margin-bottom: 10px;
+  font-weight: 500;
 }
 
 footer {
