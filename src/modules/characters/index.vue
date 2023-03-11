@@ -7,22 +7,69 @@
           <input v-model="search" v-on:keyup.enter="searchData" type="text" placeholder="Procurar Pókemon...">
         </div>
       </div>
+
     </header>
 
     <main>
+      <n-button class="modal-button" round :color="pokeType ? colors(pokeType).primary : 'black'" @click="getPoketypes">
+        {{ pokeType ? pokeType : 'Todos los tipos' }}
+      </n-button>
 
-      <div class="cards">
-        <div v-for="pokemon in pokemons" :key="pokemon.id" class="cards__container">
+      <n-modal v-model:show="showModal" preset="card">
+        <template #header>
+          <h3>Seleccione el tipo</h3>
+        </template>
+        <div class="modal-content">
+          <div class="modal-buttons">
+            <n-button color="black" class="modal-button" round @click="onPokeType('')">
+              Mostrar todos
+            </n-button>
+            <n-button
+              v-for="(type, index) in pokeTypes"
+              :key="index"
+              :color="colors(type?.name).primary"
+              class="modal-button"
+              round
+              @click="onPokeType(type.name)"
+            >
+              {{  type.name  }}
+            </n-button>
+          </div>
+        </div>
+      </n-modal>
+
+
+      <div class="" v-if="loading">
+        <div class="cards">
+          <n-skeleton
+            v-for="index in Array.from({ length: 3 })" :key="index"
+            height="80px"
+            :sharp="false"
+          />
+        </div>
+      </div>
+
+      <div v-else class="cards">
+        <div
+          v-for="pokemon in pokemons" :key="pokemon.id"
+          :style="`background-color: ${colors(pokemon.types[0].type?.name).secondary};`"
+          class="cards__container">
           <div class="card__info">
             <span class="card_id">Nº{{ pokemon.id }}</span>
             <h2>{{ pokemon.name }}</h2>
-            <div
-              :style="`background-color: ${colors(type.type?.name).primary};`"
-              class="" v-for="(type, j) in pokemon?.types" :key="j">
-              {{ type.type?.name }}
+            <div class="type__container">
+              <div :style="`background-color: ${colors(type.type?.name).primary};`"
+               v-for="(type, j) in pokemon?.types"
+                :key="j" class="type__info">
+                <div class="circle_icon">
+                  <img src="../../assets/poison.png">
+                </div>
+                <span>{{ type.type?.name }}</span>
+              </div>
             </div>
           </div>
-          <div class="card__img">
+
+          <div :style="`background-color: ${colors(pokemon.types[0].type?.name).primary};`" class="card__img">
             <div class="favorites">
               <img class="favo-heart" src="../../assets/PokeHeart.png">
             </div>
@@ -31,6 +78,14 @@
           </div>
         </div>
       </div>
+
+
+      <nav class="pagination">
+        <button class="buttons__pagination" v-on:click="prevPage">Anterior</button>
+        <a class="page__numeration">{{ page }}</a>
+        <button class="buttons__pagination" v-on:click="nextPage">Siguiente</button>
+      </nav>
+
 
     </main>
 
@@ -56,35 +111,86 @@
         </router-link>
 
       </div>
-
-
     </footer>
   </div>
 </template>
 
 <script>
 import { onMounted, ref, computed } from 'vue';
-import { pokemonClient } from "../../api";
-import { pokeTypeClient } from '../../api';
+import { pokemonClient, pokeTypeClient } from "../../api";
 import { colors } from '../common/helpers';
+import Butto from '../../components/buttons.vue';
+
+
+import { NButton, NModal, NCard, NSkeleton } from 'naive-ui'
+
 export default {
+  components: {
+    Butto,
+    NButton,
+    NModal,
+    NCard,
+    NSkeleton,
+  },
   setup() {
+    const loading = ref(false);
     const pokemonsUrl = ref([]);
     const pokemons = ref([]);
     const pokemon = ref(null);
-    const pokeType = ref([]);
+    const pokeTypes = ref([]);
+    const pokeType = ref('');
     const search = ref("");
     const page = ref(1);
+    const pages = ref(1);
 
+    const showModal = ref(false);
+
+
+    function prevPage() {
+      if (page.value > 1) {
+        page.value -= 1;
+      }
+    };
+
+    function nextPage() {
+      if (page.value < pages.value) {
+        page.value += 1;
+      }
+    };
 
     async function searchData() {
-      page.value = 1
-      getPokemons()
+        page.value = 1
+    }
+
+    async function getPoketypes () {
+      const { data } =  await pokeTypeClient.getPoketypes();
+      showModal.value = !showModal.value;
+      pokeTypes.value = data.results
+    }
+
+    async function onPokeType(name) {
+      pokeType.value = name;
+      showModal.value = false;
+      if (name) {
+        try {
+          loading.value = true;
+          const { data } =  await pokeTypeClient.getPoketype(name);
+          const pokeResultType = data.pokemon.map(pokemon => pokemon.pokemon);
+          pokemonsUrl.value = pokeResultType;
+          await getPokemonsList();
+        } finally {
+          loading.value = false;
+        }
+      } else {
+        await getPokemons();
+      }
+
+      console.log({ name })
     }
 
     function onClick(name) {
       console.log('onClick', name);
-    }
+    } 
 
     const pokemonsId = computed(() => {
       if (!pokemonsUrl.value.length) return [];
@@ -105,27 +211,26 @@ export default {
       pokemons.value = resultPokemons.map(pokemon => pokemon.value.data);
     }
 
-    async function getPokemons() {
+    async function getPokemonsUrl(type = '') {
       const { data } = await pokemonClient.getPokemons({
-        name: search.value,
-        page: page.value,
+       type,
       });
       pokemonsUrl.value = data.results;
-      console.log(data)
     }
 
-    async function getPoketypes() {
-      const { data } = await pokeTypeClient.getPoketypes();
-      pokeType.value = data.results;
+  
+
+    async function getPokemons() {
+      try {
+        loading.value = true;
+        await getPokemonsUrl();
+        await getPokemonsList();
+      } finally {
+        loading.value = false;
+      }
     }
 
-    async function init() {
-      await getPokemons();
-      await getPokemonsList();
-      await getPoketypes();
-    }
-
-    init();
+    getPokemons();
 
 
     return {
@@ -133,11 +238,20 @@ export default {
       pokemon,
       pokemons,
       pokemonsId,
-      pokeType,
       searchData,
       search,
       onClick,
+      page,
+      pages,
+      nextPage,
+      prevPage,
       colors,
+      showModal,
+      pokeTypes,
+      getPoketypes,
+      onPokeType,
+      pokeType,
+      loading,
     }
 
   }
@@ -150,6 +264,25 @@ export default {
   flex-direction: column;
   align-items: center;
   min-height: 100vh;
+  justify-content: space-between;
+}
+
+.modal-content {
+  background-color: white;
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+}
+
+.modal-buttons {
+  display: flex;
+  flex-direction: column;
+  gap: 15px;
+}
+
+.modal-button {
+  text-transform: capitalize;
 }
 
 .search {
@@ -210,7 +343,7 @@ input {
   background: #FCF3EB;
   width: 330px;
   height: 130px;
-  border-radius: 10px 0px 0px 10px;
+  border-radius: 10px;
 
   @media screen and (min-width: 700px) {
     width: 400px;
@@ -221,15 +354,14 @@ input {
 .card__info {
   display: flex;
   flex-direction: column;
-  padding-left: 20px;
+  padding-left: 10px;
   gap: 10px;
 
   h2 {
     font-size: 25px;
   }
-
   @media screen and (min-width: 700px) {
-    padding-left: 50px;
+    padding-left: 20px;
   }
 }
 
@@ -244,7 +376,7 @@ input {
   justify-content: center;
   align-items: center;
   background-color: #FF9D55;
-  padding: 65px 80px;
+  padding: 65px;
   border-radius: 10px;
   z-index: 1;
 }
@@ -283,6 +415,57 @@ input {
     z-index: 2;
   }
 }
+
+.type__container {
+  display: flex;
+  gap: 5px;
+}
+
+.type__info {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  border-radius: 50px;
+  padding: 5px 10px;
+  @media screen and (min-width: 700px) {
+     padding: 8px 20px;
+  }
+}
+
+.circle_icon{
+  padding: 3px;
+  background: var(--white-color);
+  border-radius: 20px;
+}
+
+
+.pagination {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 30px;
+  padding: 0;
+  margin-bottom: 20px;
+  @media screen and (min-width: 700px) {
+    gap: 50px;
+  }
+}
+
+.buttons__pagination {
+  background: var(--icon-text-color);
+  border-radius: 50px;
+  width: 100px;
+  height: 35px;
+  color: var(--white-color);
+  border: none;
+  cursor: pointer;
+}
+
+.page__numeration {
+  font-size: 20px;
+  color: var(--white-color);
+}
+
 
 footer {
   display: flex;

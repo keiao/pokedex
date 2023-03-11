@@ -1,8 +1,8 @@
 import { API } from "../instance/pokedexApi";
 
 export const pokeTypeClient = {
-  getPoketype(id) {
-    return API.get(`type/${id}`);
+  getPoketype(typeName) {
+    return API.get(`type/${typeName}`);
   },
   getPoketypes(params) {
     return API.get("type", {
