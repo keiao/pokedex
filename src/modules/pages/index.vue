@@ -1,87 +1,85 @@
 <template>
   <div class="home">
-    <header>
-      <div class="header__content">
-        <div class="search">
-          <img v-on:click="searchData" class="search__icon" src="../../assets/search.png" alt="search">
-          <input v-model="search" v-on:keyup.enter="searchData" type="text" placeholder="Procurar Pókemon...">
+    <div class="home_content">
+      <header class="search">
+        <img v-on:click="searchData" class="search__icon" src="../../assets/search.png" alt="search">
+        <input v-model="search" v-on:keyup.enter="searchData" type="text" placeholder="Buscar Pókemon...">
+      </header>
+  
+      <main>
+        <filters @change="onSelectType" />
+  
+        <div class="" v-if="loading">
+          <div class="cards">
+            <n-skeleton v-for="index in Array.from({ length: 5 })" :key="index" height="80px" :sharp="false" />
+          </div>
         </div>
-      </div>
 
-    </header>
-
-    <main>
-      <filters @change="onSelectType" />
-
-
-      <div class="" v-if="loading">
-        <div class="cards">
-          <n-skeleton v-for="index in Array.from({ length: 3 })" :key="index" height="80px" :sharp="false" />
-        </div>
-      </div>
-
-
-
-      <div v-else class="cards">
-        <div v-for="pokemon in pokemons" :key="pokemon.id"
-          :style="`background-color: ${colors(pokemon.types[0].type?.name).secondary};`" class="cards__container">
-          <div class="card__info">
-            <span class="card_id">Nº{{ pokemon.id }}</span>
-            <h2>{{ pokemon.name }}</h2>
-            <div class="type__container">
-              <div :style="`background-color: ${colors(type.type?.name).primary};`" v-for="(type, j) in pokemon?.types"
-                :key="j" class="type__info">
-                <div class="circle_icon">
-                  <img src="../../assets/poison.png">
+        <div v-else class="cards">
+          <div v-for="pokemon in pokemons" :key="pokemon.id"
+            :style="`background-color: ${colors(pokemon.types[0].type?.name).secondary};`" class="cards__container">
+            <div class="card__info">
+              <span class="card_id">Nº {{ String(pokemon?.id).padStart(3, '0') }}</span>
+              <h2>{{ pokemon.name }}</h2>
+              <div class="type__container">
+                <div
+                  v-for="(type, j) in pokemon?.types"
+                  :key="j"
+                  class="type__info"
+                  :style="`background-color: ${colors(type.type?.name).primary};`"
+                >
+                  <div class="circle_icon">
+                    <img :src="getIcon(type.type?.name)">
+                  </div>
+                  <span>{{ type.type?.name }}</span>
                 </div>
-                <span>{{ type.type?.name }}</span>
               </div>
             </div>
-          </div>
-
-          <div :style="`background-color: ${colors(pokemon.types[0].type?.name).primary};`" class="card__img">
-            <div class="favorites">
-              <img class="favo-heart" src="../../assets/PokeHeart.png">
+  
+            <div :style="`background-color: ${colors(pokemon.types[0].type?.name).primary};`" class="card__img">
+              <div class="favorites">
+                <img class="favo-heart" src="../../assets/PokeHeart.png">
+              </div>
+              <img class="flame__icon" src="../../assets/flame.png">
+              <img class="pokemons__img" :src="pokemon?.sprites.front_default">
             </div>
-            <img class="flame__icon" src="../../assets/flame.png">
-            <img class="pokemons__img" :src="pokemon?.sprites.front_default">
           </div>
         </div>
-      </div>
-
-
-      <nav class="pagination">
-        <button class="buttons__pagination" v-on:click="prevPage">Anterior</button>
-        <a class="page__numeration">{{ page }}</a>
-        <button class="buttons__pagination" v-on:click="nextPage">Siguiente</button>
-      </nav>
-
-
-    </main>
-
-    <footer>
-      <div class="navbar">
-
-        <router-link to="" class="nav-buttons">
-          <img src="../../assets/iconoir_pokeball.png">
-          <h4>Pokedéx</h4>
-        </router-link>
-
-        <router-link to="/generations" class="nav-buttons">
-          <img src="../../assets/PokePin.png">
-        </router-link>
-
-
-        <router-link to="/favorites" class="nav-buttons">
-          <img src="../../assets/favorites.png">
-        </router-link>
-
-        <router-link to="/profile" class="nav-buttons">
-          <img src="../../assets/profile.png">
-        </router-link>
-
-      </div>
-    </footer>
+  
+  
+        <nav class="pagination" v-if="!loading">
+          <button class="buttons__pagination" v-on:click="prevPage">Anterior</button>
+          <a class="page__numeration">{{ page }}</a>
+          <button class="buttons__pagination" v-on:click="nextPage">Siguiente</button>
+        </nav>
+  
+  
+      </main>
+  
+      <footer>
+        <div class="navbar">
+  
+          <router-link to="" class="nav-buttons">
+            <img src="../../assets/iconoir_pokeball.png">
+            <h4>Pokedéx</h4>
+          </router-link>
+  
+          <router-link to="/generations" class="nav-buttons">
+            <img src="../../assets/PokePin.png">
+          </router-link>
+  
+  
+          <router-link to="/favorites" class="nav-buttons">
+            <img src="../../assets/favorites.png">
+          </router-link>
+  
+          <router-link to="/profile" class="nav-buttons">
+            <img src="../../assets/profile.png">
+          </router-link>
+  
+        </div>
+      </footer>
+    </div>
   </div>
 </template>
 
@@ -111,12 +109,9 @@ export default {
     const search = ref("");
     const page = ref(1);
     const pages = ref(1);
-    const showModal = ref(false);
-
 
     async function onSelectType(name) {
       pokeType.value = name;
-      showModal.value = false;
       if (name) {
         try {
           loading.value = true;
@@ -130,8 +125,6 @@ export default {
       } else {
         await getPokemons();
       }
-
-      console.log({ name })
     }
 
     function prevPage() {
@@ -149,14 +142,6 @@ export default {
     async function searchData() {
       page.value = 1
     }
-
-    async function getPoketypes() {
-      const { data } = await pokeTypeClient.getPoketypes();
-      showModal.value = !showModal.value;
-      pokeTypes.value = data.results
-    }
-
-
 
     function onClick(name) {
       console.log('onClick', name);
@@ -202,6 +187,16 @@ export default {
 
     getPokemons();
 
+    function getIcon (name) {
+      const url =  new URL(`../../assets/${name}.png`, import.meta.url).href;
+
+      if (url.split('/').at(-1) === 'undefined') {
+        return new URL(`../../assets/water.png`, import.meta.url).href;
+      }
+
+      return url;
+    }
+
 
     return {
       pokemonsUrl,
@@ -216,12 +211,11 @@ export default {
       nextPage,
       prevPage,
       colors,
-      showModal,
       pokeTypes,
-      getPoketypes,
       pokeType,
       loading,
       onSelectType,
+      getIcon,
     }
 
   }
@@ -230,6 +224,15 @@ export default {
 
 <style lang="scss" scoped>
 .home {
+  display: flex;
+  justify-content: center;
+  padding: 100px 0;
+}
+
+
+.home_content {
+  max-width: 400px;
+  width: 100%;
   display: flex;
   flex-direction: column;
   align-items: center;
@@ -259,30 +262,23 @@ export default {
   display: flex;
   align-items: center;
   position: relative;
-  margin: 40px 0px 20px 0px;
-
-  @media screen and (min-width: 700px) {
-    margin: 100px 0px 40px 0px;
-  }
-}
-
-input {
-  border-radius: 50px;
-  border: 2px solid var(--border-color);
-  width: 230px;
-  height: 40px;
-  padding: 0px 50px 0px 50px;
-  color: var(--input-text-color);
-
-  &::placeholder {
-    font-size: 16px;
-    color: var(--input-text-color);
-  }
-
-  @media screen and (min-width: 700px) {
-    width: 300px;
+  input {
+    border-radius: 50px;
+    border: 2px solid var(--border-color);
+    width: 100%;
     height: 40px;
-    padding: 0px 200px 0px 50px;
+    padding: 0px 50px 0px 50px;
+    color: var(--input-text-color);
+  
+    &::placeholder {
+      font-size: 16px;
+      color: var(--input-text-color);
+    }
+  
+    @media screen and (min-width: 700px) {
+      height: 40px;
+      padding: 0px 200px 0px 50px;
+    }
   }
 }
 
@@ -292,17 +288,19 @@ input {
   left: 25px;
 }
 
+main {
+  flex: 1;
+  padding-top: 20px;
+  width: 100%;
+}
+
 .cards {
   display: flex;
   flex-direction: column;
   margin: 20px 0px;
   gap: 20px;
-
-  @media screen and (min-width: 700px) {
-    display: grid;
-    grid-template-columns: repeat(2, 1fr);
-    gap: 80px;
-    margin: 50px 0px;
+  h2 {
+    text-transform: capitalize;
   }
 }
 
@@ -337,7 +335,7 @@ input {
 }
 
 .card_id {
-  font-size: 18px;
+  font-size: 15px;
 }
 
 .card__img {
@@ -397,31 +395,36 @@ input {
   align-items: center;
   gap: 5px;
   border-radius: 50px;
-  padding: 5px 10px;
-
-  @media screen and (min-width: 700px) {
-    padding: 8px 20px;
+  padding: 5px 8px;
+  span {
+    text-transform: capitalize;
   }
 }
 
 .circle_icon {
-  padding: 3px;
+  box-sizing: border-box;
   background: var(--white-color);
-  border-radius: 20px;
+  border-radius: 50%;
+  flex-shrink: 0;
+  width: 20px;
+  height: 20px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  img {
+    height: 13px;
+  }
 }
 
 
 .pagination {
   display: flex;
-  justify-content: center;
+  justify-content: space-between;
   align-items: center;
   gap: 30px;
   padding: 0;
   margin-bottom: 20px;
-
-  @media screen and (min-width: 700px) {
-    gap: 50px;
-  }
+  width: 100%;
 }
 
 .buttons__pagination {
