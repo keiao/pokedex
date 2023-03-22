@@ -24,7 +24,7 @@
         </router-link>
 
         <router-link to="" class="nav-buttons">
-          <img src="../../assets/favoriteColor.png">
+          <img src="../../assets/favorite-color.png">
           <h4>Favoritos</h4>
         </router-link>
 
