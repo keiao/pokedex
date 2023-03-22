@@ -7,7 +7,7 @@
     </header>
     <main>
       <div>
-        <img src="../../assets/Magikarp_Jump_Pattern_01 1.png" >
+        <img src="../../assets/magikarp_empty.png" >
       </div>
         <h1>Você não favoritou nenhum Pokémon :( </h1>
         <p>Clique no ícone de coração dos seus pokémons favoritos e eles aparecerão aqui.</p>

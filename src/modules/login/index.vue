@@ -1,6 +1,6 @@
 <template>
   <div class="login">
-    <img class="logo" src="../../assets/PokédexLogo.svg" alt="poke logo">
+    <img class="logo" src="../../assets/pokedex-logo.svg" alt="poke logo">
   </div>
 </template>
 
