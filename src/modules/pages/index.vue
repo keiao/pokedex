@@ -11,7 +11,11 @@
     </header>
 
     <main>
-      <n-button class="modal-button" round :color="pokeType ? colors(pokeType).primary : 'black'" @click="getPoketypes">
+      <filters @change="onSelectType" />
+
+      <!-- <orderFilters /> -->
+
+      <!-- <n-button class="modal-button" round :color="pokeType ? colors(pokeType).primary : 'black'" @click="getPoketypes">
         {{ pokeType ? pokeType : 'Todos los tipos' }}
       </n-button>
 
@@ -36,30 +40,25 @@
             </n-button>
           </div>
         </div>
-      </n-modal>
+      </n-modal>  -->
 
 
       <div class="" v-if="loading">
         <div class="cards">
-          <n-skeleton
-            v-for="index in Array.from({ length: 3 })" :key="index"
-            height="80px"
-            :sharp="false"
-          />
+          <n-skeleton v-for="index in Array.from({ length: 3 })" :key="index" height="80px" :sharp="false" />
         </div>
       </div>
 
+
+
       <div v-else class="cards">
-        <div
-          v-for="pokemon in pokemons" :key="pokemon.id"
-          :style="`background-color: ${colors(pokemon.types[0].type?.name).secondary};`"
-          class="cards__container">
+        <div v-for="pokemon in pokemons" :key="pokemon.id"
+          :style="`background-color: ${colors(pokemon.types[0].type?.name).secondary};`" class="cards__container">
           <div class="card__info">
             <span class="card_id">Nº{{ pokemon.id }}</span>
             <h2>{{ pokemon.name }}</h2>
             <div class="type__container">
-              <div :style="`background-color: ${colors(type.type?.name).primary};`"
-               v-for="(type, j) in pokemon?.types"
+              <div :style="`background-color: ${colors(type.type?.name).primary};`" v-for="(type, j) in pokemon?.types"
                 :key="j" class="type__info">
                 <div class="circle_icon">
                   <img src="../../assets/poison.png">
@@ -119,14 +118,14 @@
 import { onMounted, ref, computed } from 'vue';
 import { pokemonClient, pokeTypeClient } from "../../api";
 import { colors } from '../common/helpers';
-import Butto from '../../components/buttons.vue';
-
-
 import { NButton, NModal, NCard, NSkeleton } from 'naive-ui'
+import filters from '../../components/filters.vue'
+
 
 export default {
   components: {
-    Butto,
+    filters,
+
     NButton,
     NModal,
     NCard,
@@ -142,9 +141,28 @@ export default {
     const search = ref("");
     const page = ref(1);
     const pages = ref(1);
-
     const showModal = ref(false);
 
+
+    async function onSelectType(name) {
+      pokeType.value = name;
+      showModal.value = false;
+      if (name) {
+        try {
+          loading.value = true;
+          const { data } = await pokeTypeClient.getPoketype(name);
+          const pokeResultType = data.pokemon.map(pokemon => pokemon.pokemon);
+          pokemonsUrl.value = pokeResultType;
+          await getPokemonsList();
+        } finally {
+          loading.value = false;
+        }
+      } else {
+        await getPokemons();
+      }
+
+      console.log({ name })
+    }
 
     function prevPage() {
       if (page.value > 1) {
@@ -159,38 +177,20 @@ export default {
     };
 
     async function searchData() {
-        page.value = 1
+      page.value = 1
     }
 
-    async function getPoketypes () {
-      const { data } =  await pokeTypeClient.getPoketypes();
+    async function getPoketypes() {
+      const { data } = await pokeTypeClient.getPoketypes();
       showModal.value = !showModal.value;
       pokeTypes.value = data.results
     }
 
-    async function onPokeType(name) {
-      pokeType.value = name;
-      showModal.value = false;
-      if (name) {
-        try {
-          loading.value = true;
-          const { data } =  await pokeTypeClient.getPoketype(name);
-          const pokeResultType = data.pokemon.map(pokemon => pokemon.pokemon);
-          pokemonsUrl.value = pokeResultType;
-          await getPokemonsList();
-        } finally {
-          loading.value = false;
-        }
-      } else {
-        await getPokemons();
-      }
 
-      console.log({ name })
-    }
 
     function onClick(name) {
       console.log('onClick', name);
-    } 
+    }
 
     const pokemonsId = computed(() => {
       if (!pokemonsUrl.value.length) return [];
@@ -213,12 +213,12 @@ export default {
 
     async function getPokemonsUrl(type = '') {
       const { data } = await pokemonClient.getPokemons({
-       type,
+        type,
       });
       pokemonsUrl.value = data.results;
     }
 
-  
+
 
     async function getPokemons() {
       try {
@@ -249,9 +249,9 @@ export default {
       showModal,
       pokeTypes,
       getPoketypes,
-      onPokeType,
       pokeType,
       loading,
+      onSelectType,
     }
 
   }
@@ -289,10 +289,10 @@ export default {
   display: flex;
   align-items: center;
   position: relative;
-  margin-top: 40px;
+  margin: 40px 0px 20px 0px;
 
   @media screen and (min-width: 700px) {
-    margin-top: 100px;
+    margin: 100px 0px 40px 0px;
   }
 }
 
@@ -360,6 +360,7 @@ input {
   h2 {
     font-size: 25px;
   }
+
   @media screen and (min-width: 700px) {
     padding-left: 20px;
   }
@@ -427,12 +428,13 @@ input {
   gap: 5px;
   border-radius: 50px;
   padding: 5px 10px;
+
   @media screen and (min-width: 700px) {
-     padding: 8px 20px;
+    padding: 8px 20px;
   }
 }
 
-.circle_icon{
+.circle_icon {
   padding: 3px;
   background: var(--white-color);
   border-radius: 20px;
@@ -446,6 +448,7 @@ input {
   gap: 30px;
   padding: 0;
   margin-bottom: 20px;
+
   @media screen and (min-width: 700px) {
     gap: 50px;
   }

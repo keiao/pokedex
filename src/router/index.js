@@ -11,22 +11,22 @@ const routes = [
   {
     path: '/home',
     name: 'home',
-    component: () => import('../modules/characters/index.vue')
+    component: () => import('../modules/pages/index.vue')
   },
   {
     path: '/favorites',
     name: 'favorites',
-    component: () => import('../modules/characters/favorites.vue')
+    component: () => import('../modules/pages/favorites.vue')
   },
   {
     path: '/generations',
     name: 'generations',
-    component: () => import('../modules/characters/generations.vue')
+    component: () => import('../modules/pages/generations.vue')
   },
   {
     path: '/profile',
     name: 'profile',
-    component: () => import('../modules/characters/profile.vue')
+    component: () => import('../modules/pages/profile.vue')
   },
 ]
 
