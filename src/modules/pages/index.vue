@@ -16,8 +16,11 @@
         </div>
 
         <div v-else class="cards">
-          <div v-for="pokemon in pokemons" :key="pokemon.id"
-            :style="`background-color: ${colors(pokemon.types[0].type?.name).secondary};`" class="cards__container">
+          <div
+            v-for="pokemon in pokemons"
+            :key="pokemon.id"
+            :style="`background-color: ${colors(pokemon.types[0].type?.name).secondary};`"
+            class="cards__container">
             <div class="card__info">
               <span class="card_id">Nº {{ String(pokemon?.id).padStart(3, '0') }}</span>
               <h2>{{ pokemon.name }}</h2>
@@ -29,7 +32,7 @@
                   :style="`background-color: ${colors(type.type?.name).primary};`"
                 >
                   <div class="circle_icon">
-                    <img :src="getIcon(type.type?.name)">
+                    <img :src="getDynamicImage(type.type?.name)">
                   </div>
                   <span>{{ type.type?.name }}</span>
                 </div>
@@ -40,7 +43,7 @@
               <div class="favorites">
                 <img class="favo-heart" src="../../assets/PokeHeart.png">
               </div>
-              <img class="flame__icon" src="../../assets/flame.png">
+              <img class="bg-icon" :src="getDynamicImage(`bg-${pokemon.types[0].type?.name}`)">
               <img class="pokemons__img" :src="pokemon?.sprites.front_default">
             </div>
           </div>
@@ -187,11 +190,11 @@ export default {
 
     getPokemons();
 
-    function getIcon (name) {
+    function getDynamicImage (name) {
       const url =  new URL(`../../assets/${name}.png`, import.meta.url).href;
 
       if (url.split('/').at(-1) === 'undefined') {
-        return new URL(`../../assets/water.png`, import.meta.url).href;
+        return new URL(`../../assets/bg-water.png`, import.meta.url).href;
       }
 
       return url;
@@ -215,7 +218,7 @@ export default {
       pokeType,
       loading,
       onSelectType,
-      getIcon,
+      getDynamicImage,
     }
 
   }
@@ -307,7 +310,7 @@ main {
 .cards__container {
   position: relative;
   display: flex;
-  align-items: center;
+  justify-content: space-between;
   background: #FCF3EB;
   width: 330px;
   height: 130px;
@@ -322,9 +325,10 @@ main {
 .card__info {
   display: flex;
   flex-direction: column;
+  justify-content: center;
   padding-left: 10px;
   gap: 10px;
-
+  flex: 1;
   h2 {
     font-size: 25px;
   }
@@ -339,15 +343,14 @@ main {
 }
 
 .card__img {
-  position: absolute;
-  right: 0;
   display: flex;
   justify-content: center;
   align-items: center;
   background-color: #FF9D55;
-  padding: 65px;
+  width: 130px;
   border-radius: 10px;
-  z-index: 1;
+  overflow: hidden;
+  position: relative;
 }
 
 
@@ -376,13 +379,9 @@ main {
   }
 }
 
-.flame__icon {
+.bg-icon {
   position: absolute;
-  width: 120px;
-
-  img {
-    z-index: 2;
-  }
+  height: 90%;
 }
 
 .type__container {
