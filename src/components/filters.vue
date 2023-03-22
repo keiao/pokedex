@@ -48,11 +48,6 @@ export default {
       pokeTypes.value = data.results
     }
 
-
-
-
-
-
     return {
       colors,
       showModal,

@@ -13,35 +13,6 @@
     <main>
       <filters @change="onSelectType" />
 
-      <!-- <orderFilters /> -->
-
-      <!-- <n-button class="modal-button" round :color="pokeType ? colors(pokeType).primary : 'black'" @click="getPoketypes">
-        {{ pokeType ? pokeType : 'Todos los tipos' }}
-      </n-button>
-
-      <n-modal v-model:show="showModal" preset="card">
-        <template #header>
-          <h3>Seleccione el tipo</h3>
-        </template>
-        <div class="modal-content">
-          <div class="modal-buttons">
-            <n-button color="black" class="modal-button" round @click="onPokeType('')">
-              Mostrar todos
-            </n-button>
-            <n-button
-              v-for="(type, index) in pokeTypes"
-              :key="index"
-              :color="colors(type?.name).primary"
-              class="modal-button"
-              round
-              @click="onPokeType(type.name)"
-            >
-              {{  type.name  }}
-            </n-button>
-          </div>
-        </div>
-      </n-modal>  -->
-
 
       <div class="" v-if="loading">
         <div class="cards">
@@ -125,7 +96,6 @@ import filters from '../../components/filters.vue'
 export default {
   components: {
     filters,
-
     NButton,
     NModal,
     NCard,
